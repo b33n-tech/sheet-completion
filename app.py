@@ -78,13 +78,11 @@ def detect_column_type(col_name, sample_values):
         pass
     
     # Vérifier email
-    if re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}
-    , sample):
+    if re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', sample):
         return 'email'
     
     # Vérifier téléphone
-    if re.match(r'^[\d\s\.\-\(\)\+]+
-    , sample) and len(sample.replace(' ', '')) >= 8:
+    if re.match(r'^[\d\s\.\-\(\)\+]+$', sample) and len(sample.replace(' ', '')) >= 8:
         return 'telephone'
     
     # Par défaut selon la longueur
@@ -246,4 +244,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    

@@ -146,25 +146,55 @@ def main():
             st.dataframe(df.head(10))
         
         # Analyse des colonnes
-        st.subheader("🔍 Analyse des colonnes")
+        st.subheader("🔍 Analyse et validation des colonnes")
+        st.info("👉 Vérifiez les types détectés et corrigez-les si nécessaire")
+        
+        # Liste de tous les types disponibles
+        available_types = [
+            'prenom', 'nom', 'email', 'telephone', 'ville', 'adresse', 
+            'code_postal', 'pays', 'entreprise', 'profession', 'date', 
+            'annee', 'age', 'prix', 'decimal', 'entier', 'paragraphe', 
+            'text', 'url', 'sexe', 'statut'
+        ]
         
         column_types = {}
-        col_info = []
+        
+        # Initialiser session state pour conserver les choix
+        if 'column_types_modified' not in st.session_state:
+            st.session_state.column_types_modified = {}
         
         for col in df.columns:
             # Prendre les 2 premières valeurs non-nulles
             sample_values = df[col].dropna().head(2).tolist()
             detected_type = detect_column_type(col, sample_values)
-            column_types[col] = detected_type
             
-            col_info.append({
-                'Colonne': col,
-                'Type détecté': detected_type,
-                'Exemple': str(sample_values[0])[:50] if sample_values else 'N/A'
-            })
+            # Utiliser le type modifié si existe, sinon le type détecté
+            if col in st.session_state.column_types_modified:
+                default_type = st.session_state.column_types_modified[col]
+            else:
+                default_type = detected_type
+            
+            col1, col2, col3 = st.columns([3, 2, 3])
+            
+            with col1:
+                st.text(f"📋 {col}")
+            
+            with col2:
+                selected_type = st.selectbox(
+                    "Type",
+                    options=available_types,
+                    index=available_types.index(default_type),
+                    key=f"type_{col}",
+                    label_visibility="collapsed"
+                )
+                column_types[col] = selected_type
+                st.session_state.column_types_modified[col] = selected_type
+            
+            with col3:
+                example_text = str(sample_values[0])[:50] if sample_values else 'N/A'
+                st.text(f"Ex: {example_text}")
         
-        df_info = pd.DataFrame(col_info)
-        st.dataframe(df_info, use_container_width=True)
+        st.divider()
         
         # Options de génération
         st.subheader("⚙️ Paramètres de génération")
